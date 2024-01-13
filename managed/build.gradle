@@ -1,0 +1,37 @@
+plugins
+{
+    id "java"
+}
+
+repositories
+{
+    mavenCentral()
+    mavenLocal()
+    gradlePluginPortal()
+}
+
+String opencvJar = System.getenv('OPENCV_JAR')
+dependencies
+{
+    implementation files(opencvJar)
+
+    testImplementation "org.mockito:mockito-all:1.10.19"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.1.0"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.1.0"
+}
+
+test {
+    useJUnitPlatform()
+    workingDir = "."
+    systemProperty "java.library.path", System.getenv('OPENCV_LIB')
+}
+
+// Setting up my Jar File.
+version = '1.0'
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'irs1318_apriltag',
+                   'Implementation-Version': version
+    }
+    baseName "irs1318_apriltag"
+}

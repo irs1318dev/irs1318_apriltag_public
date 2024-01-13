@@ -1,0 +1,27 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"java.configuration.updateBuildConfiguration": "disabled",
+		"java.format.settings.url": "../eclipse-formatter.xml",
+		"java.codeGeneration.useBlocks": true,
+		"java.format.settings.profile": "Eclipse",
+		"java.import.gradle.version": "7.0",
+		"java.format.onType.enabled": false,
+		"editor.formatOnSave": false
+	},
+	"launch": {
+		"configurations": [
+			{
+				"type": "java",
+				"name": "VisionSystem (Launch)",
+				"request": "launch",
+				"mainClass": "frc.vision.Program"
+			}
+		],
+		"compounds": []
+	}
+}
