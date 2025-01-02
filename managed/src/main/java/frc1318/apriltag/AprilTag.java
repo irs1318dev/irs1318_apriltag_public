@@ -1,10 +1,11 @@
 package frc1318.apriltag;
 
+import frc1318.AssemblyLoader;
+
 public class AprilTag
 {
     static {
-        System.loadLibrary("apriltag");
-        System.loadLibrary("irs1318_apriltag_native");
+        AssemblyLoader.Instance.ensureLoaded("apriltag");
     }
 
     /**

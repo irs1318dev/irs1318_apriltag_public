@@ -1,4 +1,4 @@
-#ifdef UseLibCamera
+#ifdef USE_LIBCAM
 
 #include <jni.h>
 #include <libcamera/libcamera.h>

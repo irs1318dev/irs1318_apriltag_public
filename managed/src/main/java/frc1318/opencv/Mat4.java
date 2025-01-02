@@ -1,5 +1,6 @@
 package frc1318.opencv;
 
+import frc1318.AssemblyLoader;
 import frc1318.ReleaseableBase;
 
 /**
@@ -7,6 +8,10 @@ import frc1318.ReleaseableBase;
  */
 public class Mat4 extends ReleaseableBase
 {
+    static {
+        AssemblyLoader.Instance.ensureLoaded();
+    }
+
     public final long nativeObj;
 
     public Mat4(long nativeObj)

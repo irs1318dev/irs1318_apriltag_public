@@ -26,6 +26,7 @@ endif()
 
 file(GLOB CPP_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 file(GLOB HEADER_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
+file(GLOB HEADER_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp)
 add_library(${PROJECT_NAME} ${CPP_SRCS} ${HEADER_SRCS})
 
 if (MSVC)
@@ -46,9 +47,13 @@ pkg_check_modules(LIBEVENT IMPORTED_TARGET libevent_pthreads)
 
 include_directories(${JNI_INCLUDE_DIRS})
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    target_compile_definitions(${PROJECT_NAME} PUBLIC IS_LINUX)
+endif()
+
 if (LIBCAMERA_FOUND AND LIBEVENT_FOUND)
     include_directories(${LIBCAMERA_INCLUDE_DIRS} ${LIBEVENT_INCLUDE_DIRS})
-    target_compile_definitions(${PROJECT_NAME} PUBLIC UseLibCamera)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC USE_LIBCAM)
     target_link_libraries(${PROJECT_NAME} PUBLIC apriltag PUBLIC ${OpenCV_LIBRARIES} PUBLIC PkgConfig::LIBCAMERA PUBLIC PkgConfig::LIBEVENT)
 else()
     target_link_libraries(${PROJECT_NAME} PUBLIC apriltag PUBLIC ${OpenCV_LIBRARIES})

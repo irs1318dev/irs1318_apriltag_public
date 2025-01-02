@@ -1,4 +1,4 @@
-#ifdef UseLibCamera
+#ifdef USE_LIBCAM
 
 #include <jni.h>
 #include <opencv2/opencv.hpp>

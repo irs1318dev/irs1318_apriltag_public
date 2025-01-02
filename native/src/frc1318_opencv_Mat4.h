@@ -9,6 +9,14 @@ extern "C" {
 #endif
 /*
  * Class:     frc1318_opencv_Mat4
+ * Method:    createAff
+ * Signature: (DDDDDDI)J
+ */
+JNIEXPORT jlong JNICALL Java_frc1318_opencv_Mat4_createAff
+  (JNIEnv *, jclass, jdouble, jdouble, jdouble, jdouble, jdouble, jdouble, jint);
+
+/*
+ * Class:     frc1318_opencv_Mat4
  * Method:    extractYawPitchRoll
  * Signature: (J[DIII)V
  */
@@ -22,14 +30,6 @@ JNIEXPORT void JNICALL Java_frc1318_opencv_Mat4_extractYawPitchRoll
  */
 JNIEXPORT void JNICALL Java_frc1318_opencv_Mat4_extractOffsetsAndAngles
   (JNIEnv *, jclass, jlong, jdoubleArray, jdoubleArray, jint, jint, jint);
-
-/*
- * Class:     frc1318_opencv_Mat4
- * Method:    createAff
- * Signature: (DDDDDDI)J
- */
-JNIEXPORT jlong JNICALL Java_frc1318_opencv_Mat4_createAff
-  (JNIEnv *, jclass, jdouble, jdouble, jdouble, jdouble, jdouble, jdouble, jint);
 
 /*
  * Class:     frc1318_opencv_Mat4

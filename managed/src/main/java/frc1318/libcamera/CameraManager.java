@@ -1,11 +1,12 @@
 package frc1318.libcamera;
 
+import frc1318.AssemblyLoader;
 import frc1318.ReleaseableBase;
 
 public class CameraManager extends ReleaseableBase
 {
     static {
-        System.loadLibrary("irs1318_apriltag_native");
+        AssemblyLoader.Instance.ensureLoaded();
     }
 
     private final long nativeObj;
