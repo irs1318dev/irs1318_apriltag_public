@@ -33,5 +33,5 @@ jar {
         attributes 'Implementation-Title': 'irs1318_apriltag',
                    'Implementation-Version': version
     }
-    baseName "irs1318_apriltag"
+    archiveBaseName = 'irs1318_apriltag'
 }

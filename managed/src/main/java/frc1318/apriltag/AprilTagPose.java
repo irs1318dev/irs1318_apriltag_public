@@ -1,5 +1,7 @@
 package frc1318.apriltag;
 
+import frc1318.opencv.Mat4;
+
 /**
  * AprilTag Pose estimate
  */

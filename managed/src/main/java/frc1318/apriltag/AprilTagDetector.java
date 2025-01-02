@@ -2,27 +2,32 @@ package frc1318.apriltag;
 
 import org.opencv.core.Mat;
 
-public class AprilTagDetector
+import frc1318.ReleaseableBase;
+
+public class AprilTagDetector extends ReleaseableBase
 {
-    private long nativeObj;
+    private final long nativeObj;
 
     AprilTagDetector(long nativeObj)
     {
+        super();
+
         this.nativeObj = nativeObj;
     }
 
     public AprilTagDetection[] detect(Mat image)
     {
+        this.checkReleased();
+
         return (AprilTagDetection[])AprilTagDetector.detect(this.nativeObj, image.nativeObj);
     }
 
-    public void destroy()
+    @Override
+    protected void releaseInternal()
     {
-        AprilTagDetector.destroy(this.nativeObj);
-        this.nativeObj = 0;
+        AprilTagDetector.release(this.nativeObj);
     }
 
     private static native Object[] detect(long nativeObj, long image);
-
-    private static native void destroy(long nativeObj);
+    private static native void release(long nativeObj);
 }

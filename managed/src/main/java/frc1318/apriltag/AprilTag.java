@@ -3,6 +3,7 @@ package frc1318.apriltag;
 public class AprilTag
 {
     static {
+        System.loadLibrary("apriltag");
         System.loadLibrary("irs1318_apriltag_native");
     }
 

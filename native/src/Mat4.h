@@ -45,7 +45,7 @@ static void extract_ypr(Matx<double, n, n>* m, double& yaw, double& pitch, doubl
     }
     else //if (form == 1)
     {
-        // ABG mode
+        // ABG mode - Tait–Bryan angles X1 Y2 Z3
         if (type == 0)
         {
             yaw = atan2(

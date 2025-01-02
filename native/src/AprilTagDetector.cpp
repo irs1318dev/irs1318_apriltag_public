@@ -11,78 +11,77 @@
 #include <tagStandard52h13.h>
 #include <opencv2/opencv.hpp>
 
-extern "C" /* specify the C calling convention */
+using namespace cv;
+
+/*
+ * Class:     frc1318_apriltag_AprilTagDetector
+ * Method:    detect
+ * Signature: (JJ)[Ljava/lang/Object;
+ */
+extern "C"
+JNIEXPORT jobjectArray JNICALL Java_frc1318_apriltag_AprilTagDetector_detect
+    (JNIEnv* env, jclass objClass, jlong nativeObj, jlong imageObj)
 {
-    using namespace cv;
+    Mat* mat = reinterpret_cast<Mat*>(imageObj);
 
-    /*
-     * Class:     frc1318_apriltag_AprilTagDetector
-     * Method:    detect
-     * Signature: (JJ)[Ljava/lang/Object;
-     */
-    JNIEXPORT jobjectArray JNICALL Java_frc1318_apriltag_AprilTagDetector_detect
-        (JNIEnv* env, jclass objClass, jlong nativeObj, jlong imageObj)
-    {
-        Mat* mat = (Mat*)imageObj;
-
-        // Make an image_u8_t from the Mat image
-        image_u8_t image =
-            {
-                .width = mat->cols,
-                .height = mat->rows,
-                .stride = mat->cols,
-                .buf = mat->data
-            };
-
-        apriltag_detector* apriltagDetector = (apriltag_detector*)nativeObj;
-
-        // detect april tags within the image
-        zarray_t* detections = apriltag_detector_detect(apriltagDetector, &image);
-
-        // gather information about classes/constructors we are using (TODO: consider caching these somewhere?)
-        jclass detectionClass = env->FindClass("frc1318/apriltag/AprilTagDetection");
-        jmethodID detectionConstructor = env->GetMethodID(detectionClass, "<init>", "(JIIFLorg/opencv/core/Point;)V");
-        jclass pointClass = env->FindClass("org/opencv/core/Point");
-        jmethodID pointConstructor = env->GetMethodID(pointClass, "<init>", "(DD)V");
-
-        // cycle through detections, convert them into a java object
-        int detectionCount = zarray_size(detections);
-        jobjectArray detectionResults = env->NewObjectArray((jsize)detectionCount, detectionClass, NULL);
-        for (int i = 0; i < detectionCount; i++)
+    // Make an image_u8_t from the Mat image
+    image_u8_t image =
         {
-            // convert the detection into the corresponding java object
-            apriltag_detection_t* det;
-            zarray_get(detections, i, &det);
+            .width = mat->cols,
+            .height = mat->rows,
+            .stride = mat->cols,
+            .buf = mat->data
+        };
 
-            jobject centerPoint = env->NewObject(pointClass, pointConstructor, det->c[0], det->c[1]);
+    apriltag_detector* apriltagDetector = reinterpret_cast<apriltag_detector*>(nativeObj);
 
-            jobject detectionResult =
-                env->NewObject(
-                    detectionClass,
-                    detectionConstructor,
-                    (jlong)det,
-                    det->id,
-                    det->hamming,
-                    det->decision_margin,
-                    centerPoint);
+    // detect april tags within the image
+    zarray_t* detections = apriltag_detector_detect(apriltagDetector, &image);
 
-            env->SetObjectArrayElement(detectionResults, i, detectionResult);
-        }
+    // gather information about classes/constructors we are using (TODO: consider caching these somewhere?)
+    jclass detectionClass = env->FindClass("frc1318/apriltag/AprilTagDetection");
+    jmethodID detectionConstructor = env->GetMethodID(detectionClass, "<init>", "(JIIFLorg/opencv/core/Point;)V");
+    jclass pointClass = env->FindClass("org/opencv/core/Point");
+    jmethodID pointConstructor = env->GetMethodID(pointClass, "<init>", "(DD)V");
 
-        zarray_destroy(detections);
-
-        return detectionResults;
-    }
-
-    /*
-     * Class:     frc1318_apriltag_AprilTagDetector
-     * Method:    destroy
-     * Signature: (J)V
-     */
-    JNIEXPORT void JNICALL Java_frc1318_apriltag_AprilTagDetector_destroy
-        (JNIEnv* env, jclass objClass, jlong nativeObj)
+    // cycle through detections, convert them into a java object
+    int detectionCount = zarray_size(detections);
+    jobjectArray detectionResults = env->NewObjectArray((jsize)detectionCount, detectionClass, NULL);
+    for (int i = 0; i < detectionCount; i++)
     {
-        apriltag_detector* td = (apriltag_detector*)nativeObj;
-        apriltag_detector_destroy(td);
+        // convert the detection into the corresponding java object
+        apriltag_detection_t* det;
+        zarray_get(detections, i, &det);
+
+        jobject centerPoint = env->NewObject(pointClass, pointConstructor, det->c[0], det->c[1]);
+
+        jobject detectionResult =
+            env->NewObject(
+                detectionClass,
+                detectionConstructor,
+                (jlong)det,
+                det->id,
+                det->hamming,
+                det->decision_margin,
+                centerPoint);
+
+        env->SetObjectArrayElement(detectionResults, i, detectionResult);
     }
+
+    zarray_destroy(detections);
+
+    return detectionResults;
+}
+
+/*
+ * Class:     frc1318_apriltag_AprilTagDetector
+ * Method:    release
+ * Signature: (J)V
+ */
+extern "C"
+JNIEXPORT void JNICALL Java_frc1318_apriltag_AprilTagDetector_release
+    (JNIEnv* env, jclass objClass, jlong nativeObj)
+{
+    apriltag_detector* td = reinterpret_cast<apriltag_detector*>(nativeObj);
+    apriltag_detector_destroy(td);
 }

@@ -36,13 +36,24 @@ else()
 endif()
 
 set(_OpenCV_REQUIRED_COMPONENTS core imgproc videoio highgui)
-find_package(OpenCV 4.8.0 EXACT COMPONENTS ${_OpenCV_REQUIRED_COMPONENTS} CONFIG REQUIRED)
+find_package(OpenCV 4.10.0 EXACT COMPONENTS ${_OpenCV_REQUIRED_COMPONENTS} CONFIG REQUIRED)
 find_package(apriltag CONFIG REQUIRED)
 find_package(JNI REQUIRED)
 
+find_package(PkgConfig)
+pkg_check_modules(LIBCAMERA IMPORTED_TARGET libcamera)
+pkg_check_modules(LIBEVENT IMPORTED_TARGET libevent_pthreads)
+
 include_directories(${JNI_INCLUDE_DIRS})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC apriltag ${OpenCV_LIBRARIES})
+if (LIBCAMERA_FOUND AND LIBEVENT_FOUND)
+    include_directories(${LIBCAMERA_INCLUDE_DIRS} ${LIBEVENT_INCLUDE_DIRS})
+    target_compile_definitions(${PROJECT_NAME} PUBLIC UseLibCamera)
+    target_link_libraries(${PROJECT_NAME} PUBLIC apriltag PUBLIC ${OpenCV_LIBRARIES} PUBLIC PkgConfig::LIBCAMERA PUBLIC PkgConfig::LIBEVENT)
+else()
+    target_link_libraries(${PROJECT_NAME} PUBLIC apriltag PUBLIC ${OpenCV_LIBRARIES})
+endif()
+
 set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION 1 VERSION ${PROJECT_VERSION})
 
 install(TARGETS ${PROJECT_NAME} DESTINATION lib)

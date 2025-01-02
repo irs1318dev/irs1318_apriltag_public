@@ -2,7 +2,10 @@ package frc1318.apriltag;
 
 import org.opencv.core.Point;
 
-public class AprilTagDetection
+import frc1318.ReleaseableBase;
+import frc1318.opencv.Mat4;
+
+public class AprilTagDetection extends ReleaseableBase
 {
     // The native object that is associated with this detection result
     private final long nativeObj;
@@ -31,7 +34,7 @@ public class AprilTagDetection
     // The 3x3 homography matrix describing the projection from an
     // "ideal" tag (with corners at (-1,1), (1,1), (1,-1), and (-1,
     // -1)) to pixels in the image. This matrix will be freed by
-    // apriltag_detection_destroy.
+    // apriltag_detection_release.
     // Stored as a matrix structure for holding double-precision values with
     //  data in row-major order (i.e. index = row*ncols + col).
     private double[] h;
@@ -42,6 +45,8 @@ public class AprilTagDetection
 
     public AprilTagDetection(long nativeObj, int id, int hamming, float decisionMargin, Point c)
     {
+        super();
+
         this.nativeObj = nativeObj;
         this.id = id;
         this.hamming = hamming;
@@ -93,6 +98,7 @@ public class AprilTagDetection
     {
         if (this.h == null)
         {
+            this.checkReleased();
             this.h = AprilTagDetection.getHomographyMatrix(this.nativeObj);
         }
 
@@ -107,6 +113,7 @@ public class AprilTagDetection
     {
         if (this.p == null)
         {
+            this.checkReleased();
             this.p = (Point[])AprilTagDetection.getVertices(this.nativeObj);
         }
 
@@ -120,7 +127,7 @@ public class AprilTagDetection
      * @param fy focal length (Y)
      * @param cx camera center (X)
      * @param cy camera center (Y)
-     * @param premultiplyMat affine transformatiomn matrix to pre-multiply
+     * @param tCameraRelBody affine transformatiomn matrix of the camera relative to the body
      * @param offsetResults the x, y, and z offsets from the robot, in inches
      * @param yprResults the yaw, pitch, and roll offsets from the robot, in degrees
      * @return affine tranformation matrix as an OpenCV matrix
@@ -131,10 +138,12 @@ public class AprilTagDetection
         double fy,
         double cx,
         double cy,
-        Mat4 premultiplyMat,
+        Mat4 tCameraRelBody,
         double[] offsetResults,
         double[] yprResults)
     {
+        this.checkReleased();
+
         return
             (AprilTagPose)AprilTagDetection.estimateTagPose(
                 this.nativeObj,
@@ -143,14 +152,60 @@ public class AprilTagDetection
                 fy,
                 cx,
                 cy,
-                premultiplyMat.nativeObj,
+                tCameraRelBody.nativeObj,
                 offsetResults,
                 yprResults);
     }
 
-    public void destroy()
+    /**
+     * Estimates the absolute pose based on the detection, camera information, and tag information
+     * @param tagSize in inches
+     * @param fx focal length (X)
+     * @param fy focal length (Y)
+     * @param cx camera center (X)
+     * @param cy camera center (Y)
+     * @param tBodyRelCamera affine transformation matrix of the body relative to the camera
+     * @param tAprilTagRelAbsolute affine transformation matrix of the apriltag relative to the absolute position
+     * @param offsetResults the x, y, and z offsets from the robot, in inches
+     * @param yprResults the yaw, pitch, and roll offsets from the robot, in degrees
+     * @return affine tranformation matrix as an OpenCV matrix
+     */
+    public AprilTagPose estimateAbsolutePose(
+        double tagSize,
+        double fx,
+        double fy,
+        double cx,
+        double cy,
+        Mat4 tBodyRelCamera,
+        Mat4 tAprilTagRelAbsolute,
+        double[] offsetResults,
+        double[] yprResults)
     {
-        AprilTagDetection.destroy(this.nativeObj);
+        this.checkReleased();
+
+        return
+            (AprilTagPose)AprilTagDetection.estimateAbsolutePose(
+                this.nativeObj,
+                tagSize,
+                fx,
+                fy,
+                cx,
+                cy,
+                tBodyRelCamera.nativeObj,
+                tAprilTagRelAbsolute.nativeObj,
+                offsetResults,
+                yprResults);
+    }
+
+    /**
+     * Clean up the resources used by this AprilTagDetection object
+     * MUST BE CALLED TO FREE MEMORY!!!
+     * DO NOT CALL OTHER FUNCTIONS AFTER CALLING THIS!
+     */
+    @Override
+    protected void releaseInternal()
+    {
+        AprilTagDetection.release(this.nativeObj);
     }
 
     private static native double[] getHomographyMatrix(long nativeObj);
@@ -159,5 +214,7 @@ public class AprilTagDetection
 
     private static native Object estimateTagPose(long nativeObj, double tagSize, double fx, double fy, double cx, double cy, long premultiplyMatObj, double[] offsetResults, double[] yprResults);
 
-    private static native void destroy(long nativeObj);
+    private static native Object estimateAbsolutePose(long nativeObj, double tagSize, double fx, double fy, double cx, double cy, long tBodyRelCameraObj, long tAprilTagRelAbsoluteObj, double[] offsetResults, double[] yprResults);
+
+    private static native void release(long nativeObj);
 }

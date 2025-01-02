@@ -1,14 +1,18 @@
-package frc1318.apriltag;
+package frc1318.opencv;
+
+import frc1318.ReleaseableBase;
 
 /**
  * Wrapper for OpenCV's C++ 4x4 Matrix of doubles (Matx44d)
  */
-public class Mat4
+public class Mat4 extends ReleaseableBase
 {
-    long nativeObj;
+    public final long nativeObj;
 
     public Mat4(long nativeObj)
     {
+        super();
+
         this.nativeObj = nativeObj;
     }
 
@@ -34,6 +38,8 @@ public class Mat4
      */
     public Mat4 invert()
     {
+        this.checkReleased();
+
         return new Mat4(Mat4.inv(this.nativeObj));
     }
 
@@ -43,6 +49,8 @@ public class Mat4
      */
     public Mat4 invertAffine()
     {
+        this.checkReleased();
+
         return new Mat4(Mat4.invAff(this.nativeObj));
     }
 
@@ -53,6 +61,8 @@ public class Mat4
      */
     public Mat4 multiply(Mat4 other)
     {
+        this.checkReleased();
+
         return new Mat4(Mat4.mult(this.nativeObj, other.nativeObj));
     }
 
@@ -67,6 +77,8 @@ public class Mat4
      */
     public void extractYawPitchRoll(double[] ypr, int type, int form, int ss)
     {
+        this.checkReleased();
+
         Mat4.extractYawPitchRoll(this.nativeObj, ypr, type, form, ss);
     }
 
@@ -81,16 +93,9 @@ public class Mat4
      */
     public void extractOffsetsAndAngles(double[] offsets, double[] ypr, int type, int form, int ss)
     {
-        Mat4.extractOffsetsAndAngles(this.nativeObj, offsets, ypr, type, form, ss);
-    }
+        this.checkReleased();
 
-    /**
-     * Release native memory
-     */
-    public void release()
-    {
-        Mat4.delete(this.nativeObj);
-        this.nativeObj = 0;
+        Mat4.extractOffsetsAndAngles(this.nativeObj, offsets, ypr, type, form, ss);
     }
     
     /**
@@ -101,6 +106,8 @@ public class Mat4
     @Override
     public String toString()
     {
+        this.checkReleased();
+
         double[] values = Mat4.extractValues(this.nativeObj);
 
         StringBuilder builder = new StringBuilder();
@@ -128,10 +135,18 @@ public class Mat4
         return builder.toString();
     }
 
-    private static native void extractYawPitchRoll(long nativeObj, double[] ypr, int type, int form, int ss);
-    private static native void extractOffsetsAndAngles(long nativeObj, double[] offsets, double[] ypr, int type, int form, int ss);
+    /**
+     * Release native memory
+     */
+    @Override
+    protected void releaseInternal()
+    {
+        Mat4.delete(this.nativeObj);
+    }
 
     private static native long createAff(double yaw, double pitch, double roll, double x, double y, double z, int type);
+    private static native void extractYawPitchRoll(long nativeObj, double[] ypr, int type, int form, int ss);
+    private static native void extractOffsetsAndAngles(long nativeObj, double[] offsets, double[] ypr, int type, int form, int ss);
     private static native long inv(long nativeObj);
     private static native long invAff(long nativeObj);
     private static native long mult(long nativeObj1, long nativeObj2);

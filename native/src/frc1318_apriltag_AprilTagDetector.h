@@ -17,10 +17,10 @@ JNIEXPORT jobjectArray JNICALL Java_frc1318_apriltag_AprilTagDetector_detect
 
 /*
  * Class:     frc1318_apriltag_AprilTagDetector
- * Method:    destroy
+ * Method:    release
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_frc1318_apriltag_AprilTagDetector_destroy
+JNIEXPORT void JNICALL Java_frc1318_apriltag_AprilTagDetector_release
   (JNIEnv *, jclass, jlong);
 
 #ifdef __cplusplus

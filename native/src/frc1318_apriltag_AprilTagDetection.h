@@ -33,10 +33,18 @@ JNIEXPORT jobject JNICALL Java_frc1318_apriltag_AprilTagDetection_estimateTagPos
 
 /*
  * Class:     frc1318_apriltag_AprilTagDetection
- * Method:    destroy
+ * Method:    estimateAbsolutePose
+ * Signature: (JDDDDDJJ[D[D)Ljava/lang/Object;
+ */
+JNIEXPORT jobject JNICALL Java_frc1318_apriltag_AprilTagDetection_estimateAbsolutePose
+  (JNIEnv *, jclass, jlong, jdouble, jdouble, jdouble, jdouble, jdouble, jlong, jlong, jdoubleArray, jdoubleArray);
+
+/*
+ * Class:     frc1318_apriltag_AprilTagDetection
+ * Method:    release
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_frc1318_apriltag_AprilTagDetection_destroy
+JNIEXPORT void JNICALL Java_frc1318_apriltag_AprilTagDetection_release
   (JNIEnv *, jclass, jlong);
 
 #ifdef __cplusplus

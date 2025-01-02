@@ -1,0 +1,44 @@
+{
+    "version": 8,
+    "configurePresets": [
+        {
+            "name": "Winx64-Debug",
+            "displayName": "Windows x64-Debug",
+            "description": "Sets Ninja generator, build and install directory",
+            "generator": "Visual Studio 17 2022",
+            "binaryDir": "${sourceDir}/out/build/x64-Debug",
+            "installDir": "${sourceDir}/out/install/x64-Debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/x64-Debug",
+                "OpenCV_DIR": "${env.OPENCV_CMAKE_DIR}",
+                "apriltag_DIR": "${env.APRILTAG_DEBUG_CMAKE_DIR}"
+            }
+        },
+        {
+            "name": "Winx64-Release",
+            "displayName": "Windows x64-Release",
+            "description": "Sets Ninja generator, build and install directory",
+            "generator": "Visual Studio 17 2022",
+            "binaryDir": "${sourceDir}/out/build/x64-Release",
+            "installDir": "${sourceDir}/out/install/x64-Release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/x64-Release",
+                "OpenCV_DIR": "${env.OPENCV_CMAKE_DIR}",
+                "apriltag_DIR": "${env.APRILTAG_CMAKE_DIR}"
+            }
+        },
+        {
+            "name": "RPi5",
+            "displayName": "RPi5",
+            "description": "Sets Ninja generator, build and install directory",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+            }
+        }
+    ]
+}

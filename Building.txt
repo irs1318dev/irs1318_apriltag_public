@@ -1,15 +1,15 @@
-To download OpenCV releases:
+To download OpenCV releases (we are currently using OpenCV 4.10.0):
 https://github.com/opencv/opencv/releases
 
 Before you can build and run, you must first set a few environment variables based on your OpenCV installation location (and apriltag build, if using Windows):
-1. Named OPENCV_JAR which is the absolute path to the opencv-460.jar file.
+1. Named OPENCV_JAR which is the absolute path to the opencv-4100.jar file.
 (2. Named OPENCV_CMAKE_DIR which is the absolute path of the directory containing the opencv cmake files.)
 (3. Named APRILTAG_DEBUG_CMAKE_DIR which is the absolute path of the directory containing the debug apriltag cmake files (built/installed from apriltag repository).)
 (4. Named APRILTAG_CMAKE_DIR which is the absolute path of the directory containing the retail apriltag cmake files (built/installed from apriltag repository).)
 
 For me, this is:
-Windows:	C:\opencv\build\java\opencv-460.jar, C:\opencv\build\x64\vc15\lib, C:\Users\wm_ra\git\apriltag\out\install\x64-Debug\share\apriltag\cmake, and C:\Users\wm_ra\git\apriltag\out\install\x64-Release\share\apriltag\cmake
-RPI:		/usr/local/share/java/opencv4/opencv-460.jar
+Windows:	C:\opencv\build\java\opencv-4100.jar, C:\opencv\build\x64\vc16\lib, C:\Users\wm_ra\git\apriltag\out\install\x64-Debug\share\apriltag\cmake, and C:\Users\wm_ra\git\apriltag\out\install\x64-Release\share\apriltag\cmake
+RPI:		/usr/local/share/java/opencv4/opencv-4100.jar
 
 On Windows you can set the environment variable using Control Panel->System->Advanced->Environment Variables.
 On Linux, add the key-value pair (KEY=VALUE) to /etc/environment.  You can also run "export OPENCV_JAR=..." for temporary variables.
