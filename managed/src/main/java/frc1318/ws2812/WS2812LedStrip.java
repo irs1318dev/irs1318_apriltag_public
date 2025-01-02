@@ -42,11 +42,25 @@ public class WS2812LedStrip extends ReleaseableBase
         WS2812LedStrip.blank(this.nativeObj, startIndex, count);
     }
 
+    public void setColor(int index, Color color)
+    {
+        this.checkReleased();
+
+        WS2812LedStrip.setColor(this.nativeObj, index, color.getRedByte(), color.getGreenByte(), color.getBlueByte());
+    }
+
     public void setColor(int index, byte r, byte g, byte b)
     {
         this.checkReleased();
 
         WS2812LedStrip.setColor(this.nativeObj, index, r, g, b);
+    }
+
+    public void setColor(int startIndex, int count, Color color)
+    {
+        this.checkReleased();
+
+        WS2812LedStrip.setColor(this.nativeObj, startIndex, count, color.getRedByte(), color.getGreenByte(), color.getBlueByte());
     }
 
     public void setColor(int startIndex, int count, byte r, byte g, byte b)

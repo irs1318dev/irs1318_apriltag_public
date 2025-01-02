@@ -42,7 +42,7 @@
         {
           "name": "OpenCV_DIR",
           "value": "${env.OPENCV_CMAKE_DIR}",
-          "type": "STRING"
+          "type": "PATH"
         },
         {
           "name": "apriltag_DIR",

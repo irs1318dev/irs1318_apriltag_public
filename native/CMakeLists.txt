@@ -12,6 +12,10 @@ option(BUILD_SHARED_LIBS "Build shared library" ON)
 # Set a default build type if none was specified
 set(default_build_type "Release")
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    add_subdirectory(piolib)
+endif()
+
 # Set the C++ version
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -27,7 +31,7 @@ endif()
 file(GLOB CPP_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 file(GLOB HEADER_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
 file(GLOB HEADER_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp)
-add_library(${PROJECT_NAME} ${CPP_SRCS} ${HEADER_SRCS})
+add_library(${PROJECT_NAME} ${CPP_SRCS} ${C_SRCS} ${HEADER_SRCS})
 
 if (MSVC)
     add_compile_definitions("_CRT_SECURE_NO_WARNINGS")
@@ -49,6 +53,9 @@ include_directories(${JNI_INCLUDE_DIRS})
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_compile_definitions(${PROJECT_NAME} PUBLIC IS_LINUX)
+
+    target_include_directories(${PROJECT_NAME} PRIVATE piotest/include)
+    target_link_libraries(${PROJECT_NAME} PRIVATE pio)
 endif()
 
 if (LIBCAMERA_FOUND AND LIBEVENT_FOUND)

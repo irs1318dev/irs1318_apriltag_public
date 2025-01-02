@@ -1,7 +1,9 @@
 #include <vector>
 
-// Some pieces inspired by the very helpful repository here: https://github.com/jgarff/rpi_ws281x/tree/master
-// Note that we would simply re-use that library, but it has not been updated to work with Raspberry Pi 5 as of December 2024.
+#ifdef IS_LINUX
+#include "../piolib/include/piolib.h"
+#endif
+
 class Color
 {
 private:
@@ -33,92 +35,41 @@ public:
     }
 };
 
-enum class LEDStripType : uint8_t
-{
-    GRB = uint8_t{0},
-    RGB = uint8_t{1},
-    GBR = uint8_t{2},
-    RBG = uint8_t{3},
-    BGR = uint8_t{4},
-    BRG = uint8_t{5},
-};
-
-// Some pieces inspired by the very helpful repository here: https://github.com/jgarff/rpi_ws281x/
-// Note that we would simply re-use that library, but it has not been updated to work with Raspberry Pi 5 as of December 2024.
+// Uses Raspberry Pi 5's PIO library from here: https://github.com/raspberrypi/utils/tree/master/piolib
 class WS2812LedStrip
 {
 private:
     int ledCount;
-    int spiFd;
+#ifdef IS_LINUX
+    PIO pio;
+    int sm;
+#endif
+    int gpioPin;
     int frequencyHz;
-    std::vector<std::byte> spiEncodedData; // SPI-encoded data.  0b100 == off, 0b110 == on.
-    uint8_t rOffset;
-    uint8_t gOffset;
-    uint8_t bOffset;
-
-    uint8_t getData(uint32_t index) const;
-    void setData(uint32_t index, const uint8_t value);
+    std::vector<std::byte> pioData; // pio data
 
 public:
-    static const int START_OFFSET = 9; // extra "0" byte(s) at the beginning of spiEncodedData to help make sure that the data starts with a clean "off"
-    static const int LED_COLORS = 3;
-    static const int RESET_TIME = 300; // microseconds
-    static const int SPI_BITS_PER_BIT = 3;
+    static const int START_OFFSET = 0; // extra "0" byte(s) at the beginning of spiEncodedData to help make sure that the data starts with a clean "off"
+    static const int BYTES_PER_PIXEL = 4; // the number of bytes per pixel (4 - 0, G, R, B)
+    static const int RED_OFFSET = 2;
+    static const int GREEN_OFFSET = 3;
+    static const int BLUE_OFFSET = 1;
 
-    // defaults to 800 KHz frequency, GRB type
-    WS2812LedStrip(int ledCount, int frequencyHz = 800 * 1000, LEDStripType type = LEDStripType::GRB) :
+    // defaults to GPIO pin 4, 800 KHz frequency, GRB type
+    WS2812LedStrip(int ledCount, int gpioPin = 4, int frequencyHz = 800 * 1000) :
         ledCount(ledCount),
-        spiFd(0),
+        gpioPin(gpioPin),
         frequencyHz(frequencyHz),
-        spiEncodedData(LED_COLORS * SPI_BITS_PER_BIT * ledCount + START_OFFSET)
+        pioData()
     {
+        this->pioData.resize(BYTES_PER_PIXEL * ledCount + START_OFFSET);
         for (int i = 0; i < START_OFFSET; i++)
         {
-            this->spiEncodedData[i] = std::byte{0};
-        }
-
-        switch (type)
-        {
-            case LEDStripType::RGB:
-                this->rOffset = uint8_t{0};
-                this->gOffset = uint8_t{1};
-                this->bOffset = uint8_t{2};
-                break;
-
-            case LEDStripType::GBR:
-                this->rOffset = uint8_t{2};
-                this->gOffset = uint8_t{0};
-                this->bOffset = uint8_t{1};
-                break;
-
-            case LEDStripType::RBG:
-                this->rOffset = uint8_t{0};
-                this->gOffset = uint8_t{2};
-                this->bOffset = uint8_t{1};
-                break;
-
-            case LEDStripType::BGR:
-                this->rOffset = uint8_t{2};
-                this->gOffset = uint8_t{1};
-                this->bOffset = uint8_t{0};
-                break;
-
-            case LEDStripType::BRG:
-                this->rOffset = uint8_t{1};
-                this->gOffset = uint8_t{2};
-                this->bOffset = uint8_t{0};
-                break;
-
-            default:
-            case LEDStripType::GRB:
-                this->rOffset = uint8_t{1};
-                this->gOffset = uint8_t{0};
-                this->bOffset = uint8_t{2};
-                break;
+            this->pioData[i] = std::byte{0};
         }
     }
 
-    int openSpi(std::string spidev);
+    int openPio();
     void release();
 
     Color getColor(uint32_t index) const;
@@ -129,3 +80,21 @@ public:
     void setColor(uint32_t startIndex, uint32_t count, const Color c);
     int render();
 };
+
+// borrowed directly from https://github.com/raspberrypi/utils/blob/master/piolib/examples/ws2812.pio.h:
+#ifdef IS_LINUX
+static const uint16_t ws2812_program_instructions[] = {
+            //     .wrap_target
+    0x6221, //  0: out    x, 1            side 0 [2] 
+    0x1223, //  1: jmp    !x, 3           side 1 [2] 
+    0x1300, //  2: jmp    0               side 1 [3] 
+    0xa342, //  3: nop                    side 0 [3] 
+            //     .wrap
+};
+
+static const struct pio_program ws2812_program = {
+    .instructions = ws2812_program_instructions,
+    .length = 4,
+    .origin = -1,
+};
+#endif
